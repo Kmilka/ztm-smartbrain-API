@@ -1,11 +1,10 @@
 const express = require('express');
-const bcrypt = require('bcrypt');
 const cors = require('cors');
 
-
-const saltRounds = 10 // increase this if you want more iterations  
-const userPassword = 'supersecretpassword'  
-const randomPassword = 'fakepassword'
+// const bcrypt = require('bcrypt');
+// const saltRounds = 10 // increase this if you want more iterations  
+// const userPassword = 'supersecretpassword'  
+// const randomPassword = 'fakepassword'
 
 const app = express();
 app.use(express.json());
@@ -17,7 +16,7 @@ const database = {
             id: '1',
             name: 'John',
             email: 'JohnDoe@invalid.com',
-            hash: '$2b$10$oIhzzK5fgdN4s.1Z.dM2juAfEP041e241sD2bohaBUSeUR3QBZ6k.',
+            password: 'cookies',
             entries: 0,
             joined: new Date()
         },
@@ -25,7 +24,7 @@ const database = {
             id: '2',
             name: 'Sally',
             email: 'SallyDoe@invalid.com',
-            hash: 'biscuits',
+            password: 'biscuits',
             entries: 0,
             joined: new Date()
         }
@@ -33,15 +32,18 @@ const database = {
 }
 
 app.get('/', (req, res) => {
-    res.json(database.users);
+    res.status(200).json('server responds');
 })
 
 app.post('/signin', (req, res) => {
     let successSignIn = false;
     database.users.forEach((user) => {
-        if ( req.body.email === user.email && bcrypt.compareSync(req.body.password, user.hash)) {
+        if ( req.body.email === user.email && 
+            req.body.password == user.password
+            // bcrypt.compareSync(req.body.password, user.hash)
+            ) {
             successSignIn = true;
-           return res.json('success');
+           return res.json(user);
         }})
     if (!successSignIn)
         res.status(400).json('error logging in');
@@ -50,20 +52,19 @@ app.post('/signin', (req, res) => {
 app.post('/register', (req, res) => {
     const { email, name, password } = req.body;
 
-    var salt = bcrypt.genSaltSync(saltRounds);
-    var hash = bcrypt.hashSync(password, salt);
+    // var salt = bcrypt.genSaltSync(saltRounds);
+    // var hash = bcrypt.hashSync(password, salt);
 
     database.users.push(
         {
             id: '200',
             name: name,
             email: email,
-            hash: hash,
+            password: password,
             entries: 0,
             joined: new Date()
         }
     );
-    res.json(database.users[database.users.length-1]);
 })
 
 app.get('/profile/:id', (req, res) => {
