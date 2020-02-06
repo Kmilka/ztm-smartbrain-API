@@ -79,7 +79,7 @@ app.get('/profile/:id', (req, res) => {
     const { id } = req.params;
     postgres.select('*').from('users').where({id})
     .then(user => {
-        if (user.length) {
+        if (user.length) {{}
             res.status(400).json('not found');
         }
         else
