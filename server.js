@@ -64,7 +64,7 @@ app.post('/register', (req, res) => {
                     joined: new Date()
             })
             .then(response => {
-                res.json(response);
+                res.json(response[0]);
             })
             .catch(err => res.status(400).json('unable to register'));
         })
@@ -92,16 +92,16 @@ app.put('/image', (req, res) => {
 
     const { id } = req.body;
 
-    postgres('users')
-    .where('id', '=', id)
+    postgres.select('*').from('users').where({id})
     .increment('entries', 1)
+    .returning('entries')
+    .then(data => {
+        res.json(data[0])})
     .catch(err => res.status(400).json('unable to get entries'));
 
 })
 
-app.listen(4000, () => {
-    console.log('app is running on port 4000')
-});
+app.listen(4000);
 
 /*
 / -> res = this works
