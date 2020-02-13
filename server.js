@@ -18,7 +18,6 @@ const postgres = knex({
 const app = express();
 app.use(express.json());
 app.use(cors());
-app.get('/', (req, res) => res.send('app works'));
 app.post('/signin', signin.handleSignIn(postgres, bcrypt));
 app.post('/register', register.handleRegister(postgres, bcrypt));
 app.get('/profile/:id', profile.profileRequest(postgres));
