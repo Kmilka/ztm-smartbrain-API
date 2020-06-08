@@ -1,32 +1,35 @@
-const express = require('express');
-const cors = require('cors');
-var knex = require('knex');
-const bcrypt = require('bcrypt');
-const register = require('./controllers/Register.js');
-const signin = require('./controllers/SignIn.js');
-const profile = require('./controllers/Profile.js');
-const image = require('./controllers/Image.js');
+const express = require("express");
+const cors = require("cors");
+var knex = require("knex");
+const bcrypt = require("bcrypt");
+const dotenv = require("dotenv");
+const register = require("./controllers/Register.js");
+const signin = require("./controllers/SignIn.js");
+const profile = require("./controllers/Profile.js");
+const image = require("./controllers/Image.js");
+
+dotenv.config();
 
 const postgres = knex({
-    client: 'pg',
-    connection: {
-      connectionString: process.env.DATABASE_URL,
-      ssl: true
-    }
-  });
+  client: "pg",
+  connection: {
+    host: 'localhost',
+    user: 'postgres',
+    password: '1234',
+    database: 'postgres' 
+  }
+});
 
 const app = express();
 app.use(express.json());
 app.use(cors());
-app.post('/signin', signin.handleSignIn(postgres, bcrypt));
-app.post('/register', register.handleRegister(postgres, bcrypt));
-app.get('/profile/:id', profile.profileRequest(postgres));
-app.put('/rank', image.handleRankRequest(postgres));
-app.post('/imageRecognition', image.handleImageRecognition);
-const PORT = process.env.PORT; 
-app.listen(PORT, () => {
-    console.log(`server listens on port ${PORT}`);
-});
+app.post("/signin", signin.handleSignIn(postgres, bcrypt));
+app.post("/register", register.handleRegister(postgres, bcrypt));
+app.get("/profile/:id", profile.profileRequest(postgres));
+app.put("/rank", image.handleRankRequest(postgres));
+app.post("/imageRecognition", image.handleImageRecognition);
+
+app.listen(process.env.MY_PORT, () => {});
 
 /*
 / -> res = this works
