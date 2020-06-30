@@ -8,7 +8,7 @@ const signin = require("./controllers/SignIn.js");
 const profile = require("./controllers/Profile.js");
 const image = require("./controllers/Image.js");
 
-dotenv.config();
+require('dotenv').config();
 
 const postgres = knex({
   client: "pg",

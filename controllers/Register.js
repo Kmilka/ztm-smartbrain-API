@@ -29,12 +29,12 @@ const handleRegister = (postgres, bcrypt) => (req, res) => {
             .then((response) => {
               res.json(response[0]);
             })
-            .catch((err) => res.status(400).json("unable to register"));
+            .catch((err) => res.status(400).json("unable to register now. try later"));
         })
         .then(trx.commit)
         .catch(trx.rollback);
     })
-    .catch((err) => res.status(400).json("transaction failed"));
+    .catch((err) => res.status(400).json("can't register with provided credentials"));
 };
 
 module.exports = {
