@@ -1,0 +1,17 @@
+version: '3.6'
+
+services: 
+    smbackend:
+        container_name: backend
+        build: ./
+        command: npm start
+        working_dir: /home/doksen/coding/smartbrainAPP/API
+        ports:
+            - "4000:4000"
+        volumes:
+            - ./:/home/doksen/coding/smartbrainAPP/API
+        
+    smpostgres:
+        build: ./postgres
+        ports:
+            - "5432:5432"
