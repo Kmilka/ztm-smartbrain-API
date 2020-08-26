@@ -15,3 +15,8 @@ services:
         build: ./postgres
         ports:
             - "5432:5432"
+
+    redis:
+        build: ./redis
+        ports:
+            - "6379:6379"

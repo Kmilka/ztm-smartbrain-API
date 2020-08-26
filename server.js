@@ -2,13 +2,17 @@ const express = require("express");
 const cors = require("cors");
 var knex = require("knex");
 const bcrypt = require("bcrypt");
-const morgan = require("morgan");
 const register = require("./controllers/Register.js");
 const signin = require("./controllers/SignIn.js");
+const signout = require("./controllers/SignOut.js");
 const profile = require("./controllers/Profile.js");
 const image = require("./controllers/Image.js");
-
+const auth = require("./controllers/Authorization.js")
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
+const redis = require('redis');
+
+const redisClient = redis.createClient({ host: 'redis' });
 
 const postgres = knex({
   client: "pg",
@@ -20,27 +24,18 @@ const postgres = knex({
   }
 });
 
+const {JWTSECRET, MY_PORT} = process.env;
 
 const app = express();
 app.use(express.json());
-app.use(morgan('combined'));
 
 app.use(cors());
-app.post("/signin", signin.handleSignIn(postgres, bcrypt));
-app.post("/register", register.handleRegister(postgres, bcrypt));
-app.get("/profile/:id", profile.profileRequest(postgres));
-app.put("/rank", image.handleRankRequest(postgres));
-app.post("/imageRecognition", image.handleImageRecognition);
+app.post("/signin", signin.signinAuthentication(postgres, bcrypt, redisClient, jwt, JWTSECRET));
+app.post("/register", register.registerAuthentication(postgres, bcrypt, redisClient, jwt, JWTSECRET));
+app.get("/signout", signout.handleSignout(redisClient));
+app.get("/profile/:id", auth.requireAuth(redisClient), profile.handleRequest(postgres));
+app.post("/profile/:id", auth.requireAuth(redisClient), profile.handleUpdate(postgres));
+app.get("/profile/:id/rank", auth.requireAuth(redisClient), profile.handleRankRequest(postgres));
+app.post("/imageRecognition", auth.requireAuth(redisClient), image.handleImageRecognition(postgres));
 
-app.listen(process.env.MY_PORT, () => {});
-
-postgres.select("*").from("users").then(data => console.log(data))
-.catch(err => console.log(err))
-
-/*
-/ -> res = this works
-/signin -> POST = success/fail
-/reqister -> POST = user
-/profile/:userId -> GET = user
-/image -> PUT  -> user
-*/
+app.listen(MY_PORT, () => {});
