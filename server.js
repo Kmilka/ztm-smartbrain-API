@@ -11,6 +11,7 @@ const auth = require("./controllers/Authorization.js")
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const redis = require('redis');
+const compression = require('compression');
 
 const redisClient = redis.createClient({ host: 'redis' });
 
@@ -28,6 +29,7 @@ const {JWTSECRET, MY_PORT} = process.env;
 
 const app = express();
 app.use(express.json());
+app.use(compression());
 
 app.use(cors());
 app.post("/signin", signin.signinAuthentication(postgres, bcrypt, redisClient, jwt, JWTSECRET));

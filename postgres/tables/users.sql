@@ -10,4 +10,6 @@ CREATE TABLE users (
     age INT
 );
 
+CREATE INDEX idx_id ON users (id);
+
 COMMIT;

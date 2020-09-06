@@ -1,0 +1,8 @@
+setup:
+    config:
+        MY_PORT: 4000
+        CLARIFAI_APIKEY: ab458a397ea04ced85ac5e40ca74b2dd
+        JWTSECRET: MXBtJo7Kn9dGFLT8
+build:
+    docker:
+      web: dockerfile 

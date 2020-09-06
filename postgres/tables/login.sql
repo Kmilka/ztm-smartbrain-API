@@ -6,4 +6,6 @@ CREATE TABLE login (
     hash VARCHAR(100) NOT NULL
 );
 
+CREATE INDEX idx_eml ON login (email);
+
 COMMIT;
