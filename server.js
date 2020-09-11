@@ -13,15 +13,13 @@ require('dotenv').config();
 const redis = require('redis');
 const compression = require('compression');
 
-const redisClient = redis.createClient({ host: 'redis' });
+const redisClient = redis.createClient(process.env.REDIS_URL);
 
 const postgres = knex({
   client: "pg",
-  connection: {
-    host: 'smpostgres',
-    user: 'postgres',
-    password: '',
-    database: 'postgres'
+  connection: process.env.DATABASE_URL ,
+  ssl: {
+    rejectUnauthorized: false
   }
 });
 
