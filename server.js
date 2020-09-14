@@ -23,13 +23,12 @@ const postgres = knex({
   }
 });
 
-const {JWTSECRET, MY_PORT} = process.env;
+const {JWTSECRET, PORT} = process.env;
 
 const app = express();
 app.use(express.json());
 app.use(compression());
 
-app.use(cors());
 app.post("/signin", signin.signinAuthentication(postgres, bcrypt, redisClient, jwt, JWTSECRET));
 app.post("/register", register.registerAuthentication(postgres, bcrypt, redisClient, jwt, JWTSECRET));
 app.get("/signout", signout.handleSignout(redisClient));
@@ -38,4 +37,4 @@ app.post("/profile/:id", auth.requireAuth(redisClient), profile.handleUpdate(pos
 app.get("/profile/:id/rank", auth.requireAuth(redisClient), profile.handleRankRequest(postgres));
 app.post("/imageRecognition", auth.requireAuth(redisClient), image.handleImageRecognition(postgres));
 
-app.listen(MY_PORT, () => {});
+app.listen(PORT, () => {});
