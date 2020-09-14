@@ -29,6 +29,19 @@ const app = express();
 app.use(express.json());
 app.use(compression());
 
+let whitelist = ['https://polar-mountain-93670.herokuapp.com/']
+let corsOptions = {
+  origin: function (origin, callback) {
+    if (whitelist.indexOf(origin) !== -1) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  }
+}
+app.use(cors(corsOptions));
+
+
 app.post("/signin", signin.signinAuthentication(postgres, bcrypt, redisClient, jwt, JWTSECRET));
 app.post("/register", register.registerAuthentication(postgres, bcrypt, redisClient, jwt, JWTSECRET));
 app.get("/signout", signout.handleSignout(redisClient));
