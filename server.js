@@ -9,6 +9,7 @@ const profile = require("./controllers/Profile.js");
 const image = require("./controllers/Image.js");
 const auth = require("./controllers/Authorization.js")
 const jwt = require('jsonwebtoken');
+const helmet = require('helmet');
 require('dotenv').config();
 const redis = require('redis');
 const compression = require('compression');
@@ -28,18 +29,11 @@ const {JWTSECRET, PORT} = process.env;
 const app = express();
 app.use(express.json());
 app.use(compression());
-
-let whitelist = ['https://polar-mountain-93670.herokuapp.com']
+app.use(helmet());
+let whitelist = ['https://polar-mountain-93670.herokuapp.com/']
 let corsOptions = {
-  origin: function (origin, callback) {
-    if (whitelist.indexOf(origin) !== -1) {
-      callback(null, true)
-    } else {
-      callback(new Error('Not allowed by CORS'))
-    }
-  },
-  methods: ['GET', 'POST'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  origin: whitelist,
+  methods: ['GET', 'POST', 'OPTIONS'],
   preflightContinue: false,
   "optionsSuccessStatus": 204
 }
