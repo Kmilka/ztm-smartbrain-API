@@ -29,7 +29,7 @@ const app = express();
 app.use(express.json());
 app.use(compression());
 
-let whitelist = ['https://polar-mountain-93670.herokuapp.com/']
+let whitelist = ['https://polar-mountain-93670.herokuapp.com']
 let corsOptions = {
   origin: function (origin, callback) {
     if (whitelist.indexOf(origin) !== -1) {
