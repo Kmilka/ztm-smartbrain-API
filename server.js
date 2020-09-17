@@ -40,7 +40,8 @@ let corsOptions = {
   },
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  
+  preflightContinue: false,
+  "optionsSuccessStatus": 204
 }
 app.use(cors(corsOptions));
 
