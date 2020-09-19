@@ -33,8 +33,7 @@ app.use(helmet());
 
 let corsOptions = {
   origin: '*',
-  methods: ['GET', 'POST', 'OPTIONS'],
-  preflightContinue: true,
+  methods: ['GET', 'POST', 'OPTIONS']
 }
 app.use(cors(corsOptions));
 
