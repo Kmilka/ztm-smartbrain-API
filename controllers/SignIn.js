@@ -28,14 +28,20 @@ const handleSignIn = (postgres, bcrypt, req) => {
 
 const getAuthTokenId = (redisClient, req, res) => {
   const { authorization } = req.headers;
-  return redisClient.get(authorization, (err, reply) => {
-    if (err || !reply) {
-      return res.status(400).json('unauthorized')
-    }
-    else {
-      return res.json({id: reply})
-    }
-  });
+  if (authorization.includes('Bearer')) {
+    const token = authorization.slice(7,authorization.length);
+    return redisClient.get(token, (err, reply) => {
+      if (err || !reply) {
+        return res.status(400).json('unauthorized')
+      }
+      else {
+        return res.json({id: reply})
+      }
+    });
+  }
+  else {
+    return res.status(400).json('unauthorized')
+  } 
 }
 
 const setToken = (redisClient, key, value) => {
