@@ -30,6 +30,9 @@ const getAuthTokenId = (redisClient, req, res) => {
   const { authorization } = req.headers;
   if (authorization.includes('Bearer')) {
     const token = authorization.slice(7,authorization.length);
+    if (!token) {
+      return res.status(401).json('unauthorized')
+    }
     return redisClient.get(token, (err, reply) => {
       if (err || !reply) {
         return res.status(400).json('unauthorized')
