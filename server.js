@@ -30,15 +30,13 @@ const app = express();
 app.use(express.json());
 app.use(compression());
 app.use(helmet());
-let whitelist = ['https://polar-mountain-93670.herokuapp.com/']
+
 let corsOptions = {
-  origin: whitelist,
+  origin: '*',
   methods: ['GET', 'POST', 'OPTIONS'],
-  preflightContinue: false,
-  "optionsSuccessStatus": 204
+  preflightContinue: true,
 }
 app.use(cors(corsOptions));
-
 
 app.post("/signin", signin.signinAuthentication(postgres, bcrypt, redisClient, jwt, JWTSECRET));
 app.post("/register", register.registerAuthentication(postgres, bcrypt, redisClient, jwt, JWTSECRET));
