@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-var knex = require("knex");
+const knex = require("knex");
 const bcrypt = require("bcrypt");
 const register = require("./controllers/Register.js");
 const signin = require("./controllers/SignIn.js");
@@ -14,13 +14,15 @@ require('dotenv').config();
 const redis = require('redis');
 const compression = require('compression');
 
-const redisClient = redis.createClient(process.env.REDIS_URL);
+const redisClient = redis.createClient({ host: 'redis' });
 
-const postgres = knex({
+const postgres =  knex({
   client: "pg",
-  connection: process.env.DATABASE_URL ,
-  ssl: {
-    rejectUnauthorized: false
+  connection: {
+    host: 'smpostgres',
+    user: 'postgres',
+    password: '',
+    database: 'postgres'
   }
 });
 
