@@ -42,9 +42,9 @@ app.use(cors(corsOptions));
 app.post("/signin", signin.signinAuthentication(postgres, bcrypt, redisClient, jwt, JWTSECRET));
 app.post("/register", register.registerAuthentication(postgres, bcrypt, redisClient, jwt, JWTSECRET));
 app.get("/signout", signout.handleSignout(redisClient));
-app.get("/profile/:id", auth.requireAuth(redisClient), profile.handleRequest(postgres));
-app.post("/profile/:id", auth.requireAuth(redisClient), profile.handleUpdate(postgres));
-app.get("/profile/:id/rank", auth.requireAuth(redisClient), profile.handleRankRequest(postgres));
-app.post("/imageRecognition", auth.requireAuth(redisClient), image.handleImageRecognition(postgres));
+app.get("/profile/:id", auth.requireAuth(redisClient, jwt, JWTSECRET), profile.handleRequest(postgres));
+app.post("/profile/:id", auth.requireAuth(redisClient, jwt, JWTSECRET), profile.handleUpdate(postgres));
+app.get("/profile/:id/rank", auth.requireAuth(redisClient, jwt, JWTSECRET), profile.handleRankRequest(postgres));
+app.post("/imageRecognition", auth.requireAuth(redisClient, jwt, JWTSECRET), image.handleImageRecognition(postgres));
 
 app.listen(PORT, () => {});

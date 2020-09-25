@@ -11,12 +11,14 @@ const handleImageRecognition = (postgres) => (req, res) => {
   app.models
     .predict("a403429f2ddf4b49b307e318f00e528b", input)
     .then(data => {
-      if (data) {
+      if (Object.keys(data.outputs[0].data).length !== 0) {
         updateUserEntries(postgres, id);
       }
       return res.json(data)
     })
-    .catch(err => res.status(400).json(`this image can't be processed. check the link!`));
+    .catch(() => {
+      res.status(400).json(`This image can't be processed`);
+    })
 };
 
 const updateUserEntries = (postgres, id) => {
