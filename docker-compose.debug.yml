@@ -1,0 +1,14 @@
+version: '3.6'
+
+services:
+  app: 
+    build: .
+    ports:
+      - "4000:4000" 
+      - "6379:6379"
+      - "5432:5432"
+      - "9229:9229"
+    command:
+      - node
+      - "--inspect-brk=0.0.0.0"
+      - "." 

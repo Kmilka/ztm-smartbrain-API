@@ -8,33 +8,38 @@ const handleSignIn = (postgres, bcrypt, req) => {
   return postgres
     .select("email", "hash")
     .from("login")
-    .where("email", "=", req.body.email)
+    .where("email", "=", email)
     .then((data) => {
-      const isValid = bcrypt.compareSync(req.body.password, data[0].hash);
+      const isValid = bcrypt.compareSync(password, data[0].hash);
       if (isValid) {
         return postgres
           .select("*")
           .from("users")
-          .where("email", "=", req.body.email)
+          .where("email", "=", email)
           .then(user => user[0])
           .catch(err => Promise.reject("unable to get user"));
       } else {
-        Promise.reject("wrong credentials");
+        throw new Error ("wrong credentials")
       }
     })
     .then(user => user)
     .catch(err => Promise.reject("wrong credentials"));
 };
 
-const getAuthTokenId = (redisClient, req, res) => {
+const getAuthTokenId = (redisClient, jwt, JWTSECRET, req, res) => {
   const { authorization } = req.headers;
   if (authorization.includes('Bearer')) {
     const token = authorization.slice(7,authorization.length);
     if (!token) {
       return res.status(401).json('unauthorized')
     }
+    jwt.verify(token, JWTSECRET, (err) => {
+      if (err) {
+          return res.status(401).json('unauthorized')
+      }
+    });
     return redisClient.get(token, (err, reply) => {
-      if (err || !reply) {
+      if (err) {
         return res.status(400).json('unauthorized')
       }
       else {
@@ -69,7 +74,7 @@ const signToken = (email, jwt, JWTSECRET) => {
 const signinAuthentication =  (postgres, bcrypt, redisClient, jwt, JWTSECRET ) => (req, res) => {
   const { authorization } = req.headers;
   return authorization ?
-    getAuthTokenId(redisClient, req, res) :
+    getAuthTokenId(redisClient, jwt, JWTSECRET, req, res) :
     handleSignIn(postgres, bcrypt, req, res)
       .then(user => {
         return user.id && user.email ? createSession(user, redisClient, jwt, JWTSECRET) : Promise.reject("incorrect form submission")
@@ -79,5 +84,5 @@ const signinAuthentication =  (postgres, bcrypt, redisClient, jwt, JWTSECRET ) =
 }
 
 module.exports = {
-  signinAuthentication: signinAuthentication,
+  signinAuthentication: signinAuthentication
 };

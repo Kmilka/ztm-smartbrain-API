@@ -1,23 +1,24 @@
-const express = require("express");
-const cors = require("cors");
-const knex = require("knex");
-const bcrypt = require("bcrypt");
-const register = require("./controllers/Register.js");
-const signin = require("./controllers/SignIn.js");
-const signout = require("./controllers/SignOut.js");
-const profile = require("./controllers/Profile.js");
-const image = require("./controllers/Image.js");
-const auth = require("./controllers/Authorization.js")
+const express = require('express');
+const cors = require('cors');
+const knex = require('knex');
+const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const helmet = require('helmet');
 require('dotenv').config();
 const redis = require('redis');
 const compression = require('compression');
+const register = require('./controllers/Register.js');
+const signin = require('./controllers/SignIn.js');
+const signout = require('./controllers/SignOut.js');
+const profile = require('./controllers/Profile.js');
+const image = require('./controllers/Image.js');
+const auth = require('./controllers/Authorization.js');
+const passwordReset = require('./controllers/passwordReset/PasswordReset.js')
 
 const redisClient = redis.createClient({ host: 'redis' });
 
 const postgres =  knex({
-  client: "pg",
+  client: 'pg',
   connection: {
     host: 'smpostgres',
     user: 'postgres',
@@ -26,7 +27,7 @@ const postgres =  knex({
   }
 });
 
-const {JWTSECRET, PORT} = process.env;
+const {JWTSECRET, PORT, CLIENTURL} = process.env;
 
 const app = express();
 app.use(express.json());
@@ -39,12 +40,14 @@ let corsOptions = {
 }
 app.use(cors(corsOptions));
 
-app.post("/signin", signin.signinAuthentication(postgres, bcrypt, redisClient, jwt, JWTSECRET));
-app.post("/register", register.registerAuthentication(postgres, bcrypt, redisClient, jwt, JWTSECRET));
-app.get("/signout", signout.handleSignout(redisClient));
-app.get("/profile/:id", auth.requireAuth(redisClient, jwt, JWTSECRET), profile.handleRequest(postgres));
-app.post("/profile/:id", auth.requireAuth(redisClient, jwt, JWTSECRET), profile.handleUpdate(postgres));
-app.get("/profile/:id/rank", auth.requireAuth(redisClient, jwt, JWTSECRET), profile.handleRankRequest(postgres));
-app.post("/imageRecognition", auth.requireAuth(redisClient, jwt, JWTSECRET), image.handleImageRecognition(postgres));
+app.post('/signin', signin.signinAuthentication(postgres, bcrypt, redisClient, jwt, JWTSECRET));
+app.post('/register', register.registerAuthentication(postgres, bcrypt, redisClient, jwt, JWTSECRET));
+app.get('/signout', signout.handleSignout(redisClient));
+app.get('/profile/:id', auth.requireAuth(redisClient, jwt, JWTSECRET), profile.handleRequest(postgres));
+app.post('/profile/:id', auth.requireAuth(redisClient, jwt, JWTSECRET), profile.handleUpdate(postgres));
+app.get('/profile/:id/rank', auth.requireAuth(redisClient, jwt, JWTSECRET), profile.handleRankRequest(postgres));
+app.post('/imageRecognition', auth.requireAuth(redisClient, jwt, JWTSECRET), image.handleImageRecognition(postgres));
+app.post('/password', passwordReset.initiatePasswordReset(postgres, redisClient, jwt, JWTSECRET, CLIENTURL));
+app.post('/password/new', passwordReset.handlePasswordReset(postgres, bcrypt, redisClient, jwt, JWTSECRET));
 
 app.listen(PORT, () => {});
