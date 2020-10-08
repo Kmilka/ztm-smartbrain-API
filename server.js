@@ -17,9 +17,9 @@ const passwordReset = require('./controllers/passwordReset/PasswordReset.js')
 
 const redisClient = redis.createClient(process.env.REDIS_URL);
 
-const postgres =  knex({
+const postgres = knex({
   client: 'pg',
-  connectionString: process.env.DATABASE_URL,
+  connection: process.env.DATABASE_URL,
   ssl: {
     rejectUnauthorized: false
   }
@@ -38,7 +38,6 @@ let corsOptions = {
 }
 app.use(cors(corsOptions));
 
-app.get('/', console.log('in here'));
 app.post('/signin', signin.signinAuthentication(postgres, bcrypt, redisClient, jwt, JWTSECRET));
 app.post('/register', register.registerAuthentication(postgres, bcrypt, redisClient, jwt, JWTSECRET));
 app.get('/signout', signout.handleSignout(redisClient));
