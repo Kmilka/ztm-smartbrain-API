@@ -37,7 +37,7 @@ let corsOptions = {
   methods: ['GET', 'POST', 'OPTIONS']
 }
 app.use(cors(corsOptions));
-
+app.get('/', function(res, req) {return res.json('in here')})
 app.post('/signin', signin.signinAuthentication(postgres, bcrypt, redisClient, jwt, JWTSECRET));
 app.post('/register', register.registerAuthentication(postgres, bcrypt, redisClient, jwt, JWTSECRET));
 app.get('/signout', signout.handleSignout(redisClient));
