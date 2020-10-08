@@ -18,6 +18,7 @@ const passwordReset = require('./controllers/passwordReset/PasswordReset.js')
 const redisClient = redis.createClient(process.env.REDIS_URL);
 
 const postgres =  knex({
+  client: 'pg',
   connectionString: process.env.DATABASE_URL,
   ssl: {
     rejectUnauthorized: false
