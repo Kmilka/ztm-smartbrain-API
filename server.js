@@ -15,15 +15,12 @@ const image = require('./controllers/Image.js');
 const auth = require('./controllers/Authorization.js');
 const passwordReset = require('./controllers/passwordReset/PasswordReset.js')
 
-const redisClient = redis.createClient({ host: 'redis' });
+const redisClient = redis.createClient(process.env.REDIS_URL);
 
 const postgres =  knex({
-  client: 'pg',
-  connection: {
-    host: 'smpostgres',
-    user: 'postgres',
-    password: '',
-    database: 'postgres'
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
   }
 });
 
