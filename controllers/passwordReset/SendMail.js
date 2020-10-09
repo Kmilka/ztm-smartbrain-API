@@ -9,14 +9,6 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-transporter.verify(function(error, success) {
-  if (error) {
-    console.log(error);
-  } else {
-    console.log("Server is ready to take our messages");
-  }
-});
-
 function createMessage(...content) {
   const messageInfo = {
     from: '<smartbrain.io@invalidmail.com> SmartBrain',
@@ -33,13 +25,9 @@ function createMessage(...content) {
     subject: messageInfo.subject,
     text: link? `${messageInfo.passwordResetText} Link: ${link}`: `${messageInfo.blankEmailText}`,
     html: "",
-  }, function(error, success) {
-    if (error) {
-      console.log(error);
-    } else {
-      console.log("Server");
-    }
-  });
+  })
+  .then(() => Promise.resolve('email was sent'))
+  .catch(err => Promise.reject('error occured while email generation'))
 }
 
 module.exports = {
