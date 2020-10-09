@@ -62,7 +62,9 @@ const initiatePasswordReset = (postgres, redisClient, jwt, JWTSECRET, CLIENTURL)
         return false;
     }
 
-    return isUserRegistered ?
+    const link = isUserRegistered();
+
+    return link ?
         mailing.createMessage(email, link) : mailing.createMessage(email)
         .then(() => res.status(200))
         .catch(err => {
