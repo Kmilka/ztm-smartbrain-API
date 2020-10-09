@@ -50,22 +50,17 @@ const initiatePasswordReset = (postgres, redisClient, jwt, JWTSECRET, CLIENTURL)
     }
 
     const isUserRegistered = () => {
-        const user = postgres
+        return postgres
             .select('*')
             .from('users')
             .where('email', '=', email)
             .then(data => data)
             .catch(console.log);
-        if (user.length) {
-            return generatePasswordResetLink(user[0].id)
-        }
-        return false;
     }
 
-    const link = isUserRegistered();
-
-    return link ?
-        mailing.createMessage(email, link) : mailing.createMessage(email)
+    const user = isUserRegistered();
+    const link = user.length ? generatePasswordResetLink(user[0].id) : null;
+    return mailing.createMessage(email, link)
         .then(() => res.status(200))
         .catch(err => {
             console.log(err);
