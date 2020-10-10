@@ -26,8 +26,6 @@ function createMessage(...content) {
     text: link? `${messageInfo.passwordResetText} Link: ${link}`: `${messageInfo.blankEmailText}`,
     html: "",
   })
-  .then(() => Promise.resolve('email was sent'))
-  .catch(err => Promise.reject('error occured while email generation'))
 }
 
 module.exports = {

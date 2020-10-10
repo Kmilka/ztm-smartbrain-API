@@ -25,6 +25,18 @@ const postgres = knex({
   }
 });
 
+// const redisClient = redis.createClient({ host: 'redis' });
+
+// const postgres =  knex({
+//   client: "pg",
+//   connection: {
+//     host: 'smpostgres',
+//     user: 'postgres',
+//     password: '',
+//     database: 'postgres'
+//   }
+// });
+
 const {JWTSECRET, PORT, CLIENTURL} = process.env;
 
 const app = express();
