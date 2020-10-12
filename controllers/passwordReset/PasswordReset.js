@@ -58,24 +58,22 @@ const initiatePasswordReset = (postgres, redisClient, jwt, JWTSECRET, CLIENTURL)
     })
 }
 
-
-const verifyToken = (jwt, JWTSECRET, token) => {
+const verifyToken = (jwt, JWTSECRET, redisClient) => (req, res) => {
+    const { token } = req.params;
     if (!token) {
-        throw new Error ('bad request')
+        return res.status(400).json('Token was not provided')
     }
-    return jwt.verify(token, JWTSECRET)
-}
 
-async function changePassword (postgres, bcrypt, redisClient, password, token) {
+    jwt.verify(token, JWTSECRET);
     return redisClient.get(token, (err, reply) => {
-        if (err) {
-            console.log(err, 'err')
-            throw new Error(err)
+        if (err || !reply) {
+            res.status(400).json('Token was used')
         } else {
             redisClient.del(token);
-            return putNewPasswordInDB(reply, password, postgres, bcrypt)
+            return res.status(200).json(reply);
         }
-})
+    })
+
 }
 
 const putNewPasswordInDB = (id, password, postgres, bcrypt ) => {
@@ -84,27 +82,26 @@ const putNewPasswordInDB = (id, password, postgres, bcrypt ) => {
     const hash = bcrypt.hashSync(password, salt);
     return postgres('login')
     .where('id', '=', id)
-    .update( 'hash', hash)
+    .update('hash', hash)
     .then(status => {
-        if (status === [1]) {
+        if (status === 1) {
             return {success: true}
         } else {
             return {success: false}
         }
     })
-    .catch(err => Promise.reject(err))
+    .catch(err => Promise.reject('password was not updated'))
 }
 
-const handlePasswordReset = (postgres, bcrypt, redisClient, jwt, JWTSECRET) => (req, res) => {
-    const { token, password } = req.body;
-    if (!token || !password) {
+const handlePasswordReset = (postgres, bcrypt) => (req, res) => {
+    const { id, password } = req.body;
+    if (!id || !password) {
         return res.status(400).json('incorrect form submission')
     }
 
-    verifyToken(jwt, JWTSECRET, token);
-    return changePassword(postgres, bcrypt, redisClient, password, token)
-        .then(status => {
-            if (status) {
+    return putNewPasswordInDB(id, password, postgres, bcrypt)
+        .then(result => {
+            if (result.success) {
                 res.status(200).json('password was updated')
             } else {
                 res.status(400).json('update failed')
@@ -117,5 +114,6 @@ const handlePasswordReset = (postgres, bcrypt, redisClient, jwt, JWTSECRET) => (
 
 module.exports = {
     initiatePasswordReset: initiatePasswordReset,
-    handlePasswordReset: handlePasswordReset
+    handlePasswordReset: handlePasswordReset,
+    verifyToken: verifyToken
 }

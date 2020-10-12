@@ -5,11 +5,7 @@ const requireAuth = (redisClient, jwt, JWTSECRET) =>  (req, res, next) => {
         if (!token) {
             return res.status(401).json('unauthorized')
         }
-        jwt.verify(token, JWTSECRET, (err) => {
-            if (err) {
-                return res.status(401).json('unauthorized')
-            }
-        });
+        jwt.verify(token, JWTSECRET);
         redisClient.get(token, (err) => {
             if (err) {
                 return res.status(401).json('unathorized')

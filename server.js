@@ -57,6 +57,7 @@ app.post('/profile/:id', auth.requireAuth(redisClient, jwt, JWTSECRET), profile.
 app.get('/profile/:id/rank', auth.requireAuth(redisClient, jwt, JWTSECRET), profile.handleRankRequest(postgres));
 app.post('/imageRecognition', auth.requireAuth(redisClient, jwt, JWTSECRET), image.handleImageRecognition(postgres));
 app.post('/password', passwordReset.initiatePasswordReset(postgres, redisClient, jwt, JWTSECRET, CLIENTURL));
-app.post('/password/new', passwordReset.handlePasswordReset(postgres, bcrypt, redisClient, jwt, JWTSECRET));
+app.post('/password/new', passwordReset.handlePasswordReset(postgres, bcrypt));
+app.get('/password/:token', passwordReset.verifyToken(jwt, JWTSECRET, redisClient));
 
 app.listen(PORT, () => {});

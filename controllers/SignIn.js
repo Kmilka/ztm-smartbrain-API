@@ -5,6 +5,8 @@ const handleSignIn = (postgres, bcrypt, req) => {
     return Promise.reject("incorrect form submission");
   }
 
+  console.log(req.body)
+
   return postgres
     .select("email", "hash")
     .from("login")
